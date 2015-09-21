@@ -1,118 +1,137 @@
 package org.icatproject.core.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
+import javax.persistence.Basic;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.lucene.document.DateTools;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.DateTools.Resolution;
-import org.apache.lucene.document.Field.Store;
+import org.eclipse.persistence.nosql.annotations.DataFormatType;
+import org.eclipse.persistence.nosql.annotations.Field;
+import org.eclipse.persistence.nosql.annotations.NoSql;
 
-@Comment("A data file")
-@SuppressWarnings("serial")
-@Entity
-@XmlRootElement
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "DATASET_ID", "NAME" }) })
+/**
+ * The persistent class for the DATAFILE nosql database table.
+ * 
+ */
+@Entity()
+@NoSql(dataFormat = DataFormatType.MAPPED, dataType = "DATAFILENOSQL")
 public class Datafile extends EntityBaseBean implements Serializable {
 
-	@Comment("Checksum of file represented as a string")
-	private String checksum;
+	private static final Logger logger = Logger.getLogger(Datafile.class);
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "datafile")
-	private List<DataCollectionDatafile> dataCollectionDatafiles = new ArrayList<DataCollectionDatafile>();
+	@Basic
+	protected String createId;
 
-	@Comment("Date of creation of the actual file rather than storing the metadata")
+	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date datafileCreateTime;
+	protected Date createTime;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private DatafileFormat datafileFormat;
+	@Basic
+	protected String modId;
 
-	@Comment("Date of modification of the actual file rather than of the metadata")
+	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date datafileModTime;
+	protected Date modTime;
 
-	@Comment("The dataset which holds this file")
-	@JoinColumn(name = "DATASET_ID", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Dataset dataset;
+	@Basic
+	protected String checksum;
 
-	@Comment("A full description of the file contents")
+	@Basic
 	private String description;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "destDatafile")
-	private List<RelatedDatafile> destDatafiles = new ArrayList<RelatedDatafile>();
-
-	@Comment("The Digital Object Identifier associated with this data file")
+	@Basic
 	private String doi;
 
-	@Comment("Expressed in bytes")
+	@Basic
 	private Long fileSize;
 
-	@Comment("The logical location of the file - which may also be the physical location")
+	@Basic
 	private String location;
 
-	@Comment("A name given to the file")
-	@Column(name = "NAME", nullable = false)
+	@Basic
 	private String name;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "datafile")
-	private List<DatafileParameter> parameters = new ArrayList<DatafileParameter>();
+	@Field(name = "DATASET_ID")
+	private Long dataset;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "sourceDatafile")
-	private List<RelatedDatafile> sourceDatafiles = new ArrayList<RelatedDatafile>();
+	@Id
+	@GeneratedValue
+	@Field(name = "_id")
+	protected Long id;
 
-	/* Needed for JPA */
 	public Datafile() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getCreateId() {
+		return createId;
+	}
+
+	public void setCreateId(String createId) {
+		this.createId = createId;
+	}
+
+	@Override
+	public Date getCreateTime() {
+		// TODO Auto-generated method stub
+		return super.getCreateTime();
+	}
+
+	@Override
+	public void setCreateTime(Date createTime) {
+		// TODO Auto-generated method stub
+		super.setCreateTime(createTime);
+	}
+
+	@Override
+	public String getModId() {
+		// TODO Auto-generated method stub
+		return super.getModId();
+	}
+
+	@Override
+	public void setModId(String modId) {
+		// TODO Auto-generated method stub
+		super.setModId(modId);
+	}
+
+	@Override
+	public Date getModTime() {
+		// TODO Auto-generated method stub
+		return super.getModTime();
+	}
+
+	@Override
+	public void setModTime(Date modTime) {
+		// TODO Auto-generated method stub
+		super.setModTime(modTime);
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getChecksum() {
 		return checksum;
 	}
 
-	public List<DataCollectionDatafile> getDataCollectionDatafiles() {
-		return dataCollectionDatafiles;
-	}
-
-	public Date getDatafileCreateTime() {
-		return datafileCreateTime;
-	}
-
-	public DatafileFormat getDatafileFormat() {
-		return datafileFormat;
-	}
-
-	public Date getDatafileModTime() {
-		return datafileModTime;
-	}
-
-	public Dataset getDataset() {
+	public Long getDataset() {
 		return dataset;
 	}
 
 	public String getDescription() {
 		return description;
-	}
-
-	public List<RelatedDatafile> getDestDatafiles() {
-		return destDatafiles;
 	}
 
 	public String getDoi() {
@@ -131,44 +150,16 @@ public class Datafile extends EntityBaseBean implements Serializable {
 		return name;
 	}
 
-	public List<DatafileParameter> getParameters() {
-		return parameters;
-	}
-
-	public List<RelatedDatafile> getSourceDatafiles() {
-		return sourceDatafiles;
-	}
-
 	public void setChecksum(String checksum) {
 		this.checksum = checksum;
 	}
 
-	public void setDataCollectionDatafiles(List<DataCollectionDatafile> dataCollectionDatafiles) {
-		this.dataCollectionDatafiles = dataCollectionDatafiles;
-	}
-
-	public void setDatafileCreateTime(Date datafileCreateTime) {
-		this.datafileCreateTime = datafileCreateTime;
-	}
-
-	public void setDatafileFormat(DatafileFormat datafileFormat) {
-		this.datafileFormat = datafileFormat;
-	}
-
-	public void setDatafileModTime(Date datafileModTime) {
-		this.datafileModTime = datafileModTime;
-	}
-
-	public void setDataset(Dataset dataset) {
+	public void setDataset(Long dataset) {
 		this.dataset = dataset;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public void setDestDatafiles(List<RelatedDatafile> destDatafiles) {
-		this.destDatafiles = destDatafiles;
 	}
 
 	public void setDoi(String doi) {
@@ -187,18 +178,10 @@ public class Datafile extends EntityBaseBean implements Serializable {
 		this.name = name;
 	}
 
-	public void setParameters(List<DatafileParameter> parameters) {
-		this.parameters = parameters;
-	}
-
-	public void setSourceDatafiles(List<RelatedDatafile> sourceDatafiles) {
-		this.sourceDatafiles = sourceDatafiles;
-	}
-
 	@Override
 	public Document getDoc() {
 		Document doc = new Document();
-		StringBuilder sb = new StringBuilder(name);
+		/*StringBuilder sb = new StringBuilder(name);
 		if (description != null) {
 			sb.append(" " + description);
 		}
@@ -211,17 +194,13 @@ public class Datafile extends EntityBaseBean implements Serializable {
 		}
 		doc.add(new TextField("text", sb.toString(), Store.NO));
 		if (datafileModTime != null) {
-			doc.add(new StringField("date", DateTools.dateToString(datafileModTime,
-					Resolution.MINUTE), Store.NO));
-
+			doc.add(new StringField("date", DateTools.dateToString(datafileModTime, Resolution.MINUTE), Store.NO));
 		} else if (datafileCreateTime != null) {
-			doc.add(new StringField("date", DateTools.dateToString(datafileCreateTime,
-					Resolution.MINUTE), Store.NO));
+			doc.add(new StringField("date", DateTools.dateToString(datafileCreateTime, Resolution.MINUTE), Store.NO));
 		} else {
-			doc.add(new StringField("date", DateTools.dateToString(modTime, Resolution.MINUTE),
-					Store.NO));
+			doc.add(new StringField("date", DateTools.dateToString(modTime, Resolution.MINUTE), Store.NO));
 		}
-		doc.add(new StringField("dataset", "Dataset:" + dataset.id, Store.YES));
+		doc.add(new StringField("dataset", "Dataset:" + dataset.getId(), Store.YES));*/
 		return doc;
 	}
 }

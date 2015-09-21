@@ -1,136 +1,190 @@
 package org.icatproject.core.entity;
 
 import java.io.Serializable;
+
+import javax.persistence.*;
+
+import org.eclipse.persistence.nosql.annotations.DataFormatType;
+import org.eclipse.persistence.nosql.annotations.Field;
+import org.eclipse.persistence.nosql.annotations.JoinField;
+import org.eclipse.persistence.nosql.annotations.NoSql;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.lucene.document.DateTools;
-import org.apache.lucene.document.DateTools.Resolution;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-
-@Comment("A collection of data files and part of an investigation")
-@SuppressWarnings("serial")
+/**
+ * The persistent class for the DATASET nosql database table.
+ * 
+ */
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "INVESTIGATION_ID", "NAME" }) })
-@XmlRootElement
+@NoSql(dataFormat=DataFormatType.MAPPED, dataType="DATASETNOSQL")
 public class Dataset extends EntityBaseBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-	@Comment("May be set to true when all data files and parameters have been added to the data set. The precise meaning is facility dependent.")
-	@Column(nullable = false)
-	private boolean complete;
+	@Id
+	@GeneratedValue
+	@Field(name="_id")
+	protected Long id;
 
-	@Comment("The data files within the dataset")
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "dataset")
-	private List<Datafile> datafiles = new ArrayList<Datafile>();
+	@Basic
+	private String createId;
 
-	@Comment("An informal description of the data set")
+	@Temporal(TemporalType.TIMESTAMP)
+	@Basic
+	private Date createTime;
+
+	@Basic
 	private String description;
 
-	@Comment("The Digital Object Identifier associated with this data set")
+	@Basic
 	private String doi;
 
-	@Column(name = "END_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date endDate;
-
-	@JoinColumn(name = "INVESTIGATION_ID", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Investigation investigation;
-
-	public List<DataCollectionDataset> getDataCollectionDatasets() {
-		return dataCollectionDatasets;
-	}
-
-	public void setDataCollectionDatasets(List<DataCollectionDataset> dataCollectionDatasets) {
-		this.dataCollectionDatasets = dataCollectionDatasets;
-	}
-
-	@Comment("Identifies a location from which all the files of the data set might be accessed. It might be a directory")
+	@Basic
 	private String location;
 
-	@Comment("A short name for the data set")
-	@Column(name = "NAME", nullable = false)
-	private String name;
-
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "dataset")
-	private List<DataCollectionDataset> dataCollectionDatasets = new ArrayList<DataCollectionDataset>();
-
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "dataset")
-	private List<DatasetParameter> parameters = new ArrayList<DatasetParameter>();
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Sample sample;
+	@Basic
+	private String modId;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@Basic
+	private Date modTime;
+
+	private String name;
+
+	@Field(name="INVESTIGATION_ID")
+	private Long investigationId;
+	
+	private Long sampleId;
+	
+	private Long typeId;
+	
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date startDate;
-
-	@JoinColumn(nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private DatasetType type;
-
-	/* Needed for JPA */
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date endDate;
+	
+	private boolean complete;
+	
+	//@OneToMany
+	@JoinField(name="DATAFFILE_IDS")
+	private List<Long> datafiles = new ArrayList<Long>();
+	
 	public Dataset() {
 	}
 
-	public List<Datafile> getDatafiles() {
-		return datafiles;
+	public Long getId() {
+		return this.id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getCreateId() {
+		return this.createId;
+	}
+
+	public void setCreateId(String createId) {
+		this.createId = createId;
+	}
+
+	public Date getCreateTime() {
+		return this.createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public String getDoi() {
-		return doi;
+		return this.doi;
 	}
 
-	public Date getEndDate() {
-		return this.endDate;
-	}
-
-	public Investigation getInvestigation() {
-		return investigation;
+	public void setDoi(String doi) {
+		this.doi = doi;
 	}
 
 	public String getLocation() {
 		return this.location;
 	}
 
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getModId() {
+		return this.modId;
+	}
+
+	public void setModId(String modId) {
+		this.modId = modId;
+	}
+
+	public Date getModTime() {
+		return this.modTime;
+	}
+
+	public void setModTime(Date modTime) {
+		this.modTime = modTime;
+	}
+
 	public String getName() {
 		return this.name;
 	}
 
-	public List<DatasetParameter> getParameters() {
-		return parameters;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public Sample getSample() {
-		return sample;
+	public Long getInvestigationId() {
+		return investigationId;
+	}
+
+	public void setInvestigationId(Long investigation_id) {
+		this.investigationId = investigation_id;
+	}
+
+	public Long getSampleId() {
+		return sampleId;
+	}
+
+	public void setSampleId(Long sample_id) {
+		this.sampleId = sample_id;
+	}
+
+	public Long getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(Long type_id) {
+		this.typeId = type_id;
 	}
 
 	public Date getStartDate() {
-		return this.startDate;
+		return startDate;
 	}
 
-	public DatasetType getType() {
-		return type;
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 
 	public boolean isComplete() {
@@ -141,83 +195,16 @@ public class Dataset extends EntityBaseBean implements Serializable {
 		this.complete = complete;
 	}
 
-	public void setDatafiles(List<Datafile> datafiles) {
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public List<Long> getDatafiles() {
+		return datafiles;
+	}
+
+	public void setDatafiles(List<Long> datafiles) {
 		this.datafiles = datafiles;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setDoi(String doi) {
-		this.doi = doi;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public void setInvestigation(Investigation investigation) {
-		this.investigation = investigation;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setParameters(List<DatasetParameter> parameters) {
-		this.parameters = parameters;
-	}
-
-	public void setSample(Sample sample) {
-		this.sample = sample;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public void setType(DatasetType type) {
-		this.type = type;
-	}
-
-	@Override
-	public Document getDoc() {
-		Document doc = new Document();
-		StringBuilder sb = new StringBuilder(name + " " + type.getName() + " " + type.getName());
-		if (description != null) {
-			sb.append(" " + description);
-		}
-		if (doi != null) {
-			sb.append(" " + doi);
-		}
-		if (sample != null) {
-			sb.append(" " + sample.getName());
-			if (sample.getType() != null) {
-				sb.append(" " + sample.getType().getName());
-			}
-		}
-		doc.add(new TextField("text", sb.toString(), Store.NO));
-		if (startDate != null) {
-			doc.add(new StringField("startDate", DateTools.dateToString(startDate,
-					Resolution.MINUTE), Store.NO));
-		} else {
-			doc.add(new StringField("startDate",
-					DateTools.dateToString(modTime, Resolution.MINUTE), Store.NO));
-		}
-		if (endDate != null) {
-			doc.add(new StringField("endDate", DateTools.dateToString(endDate, Resolution.MINUTE),
-					Store.NO));
-		} else {
-			doc.add(new StringField("endDate", DateTools.dateToString(modTime, Resolution.MINUTE),
-					Store.NO));
-		}
-		doc.add(new StringField("investigation", "Investigation:" + investigation.id, Store.YES));
-		return doc;
 	}
 
 }
